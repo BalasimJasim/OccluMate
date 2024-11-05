@@ -1,0 +1,78 @@
+@use "sass:map";
+@use "./variables" as vars;
+
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin card {
+    background: vars.$bg-primary;
+    border-radius: vars.$border-radius;
+    box-shadow: vars.$shadow-sm;
+    padding: vars.$spacing-unit * 6;
+}
+
+@mixin form-input {
+    width: 100%;
+    padding: vars.$spacing-unit * 3;
+    border: 1px solid vars.$border-color;
+    border-radius: vars.$border-radius;
+    font-size: vars.$font-size-base;
+    transition: border-color 0.2s ease;
+    
+    &:focus {
+        outline: none;
+        border-color: vars.$primary-color;
+    }
+}
+
+@mixin button($bg-color: vars.$primary-color) {
+    padding: vars.$spacing-unit * 3 vars.$spacing-unit * 6;
+    background-color: $bg-color;
+    color: white;
+    border: none;
+    border-radius: vars.$border-radius;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    
+    &:hover {
+        opacity: 0.9;
+    }
+    
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+@mixin button-primary {
+    @include button(vars.$primary-color);
+    color: white;
+    
+    &:hover {
+        background: darken(vars.$primary-color, 5%);
+    }
+}
+
+@mixin button-secondary {
+    @include button(white);
+    color: vars.$text-secondary;
+    border: 1px solid vars.$border-color;
+    
+    &:hover {
+        background: vars.$bg-secondary;
+    }
+}
+
+@mixin responsive($breakpoint) {
+    @media (min-width: map.get(vars.$breakpoints, $breakpoint)) {
+        @content;
+    }
+}
+
+@mixin card-style {
+    @include card;
+}

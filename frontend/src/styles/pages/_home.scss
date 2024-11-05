@@ -1,0 +1,218 @@
+@use '../abstract/variables' as vars;
+@use '../abstract/mixins' as mix;
+
+.home-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h1 {
+    font-size: 2rem;
+    color: vars.$text-primary;
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+
+    section {
+      background: white;
+      border-radius: vars.$border-radius;
+      padding: 1.5rem;
+      box-shadow: vars.$shadow-sm;
+      
+      h2 {
+        font-size: 1.25rem;
+        color: vars.$text-primary;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid vars.$border-color;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        svg {
+          color: vars.$primary-color;
+        }
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          border-bottom: 1px solid vars.$border-color;
+          transition: background-color 0.2s ease;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background-color: #f8fafc;
+          }
+
+          p {
+            margin: 0;
+            color: vars.$text-secondary;
+            font-size: 0.95rem;
+          }
+
+          .btn-link {
+            color: vars.$primary-color;
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: vars.$border-radius;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background-color: rgba(vars.$primary-color, 0.1);
+            }
+          }
+
+          button {
+            @include mix.button(vars.$success-color);
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+          }
+        }
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.75rem 1.25rem;
+        background-color: vars.$primary-color;
+        color: white;
+        border: none;
+        border-radius: vars.$border-radius;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+
+        svg {
+          font-size: 1rem;
+        }
+
+        &:hover {
+          background-color: darken(vars.$primary-color, 5%);
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  .quick-actions {
+    h2 {
+      font-size: 1.25rem;
+      color: vars.$text-primary;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid vars.$border-color;
+        border-radius: vars.$border-radius;
+        background: white;
+        color: vars.$text-primary;
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        svg {
+          font-size: 1.25rem;
+          color: vars.$primary-color;
+        }
+
+        &:hover {
+          border-color: vars.$primary-color;
+          background: rgba(vars.$primary-color, 0.05);
+          transform: translateY(-1px);
+          box-shadow: vars.$shadow-sm;
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        &.secondary {
+          background: white;
+          
+          &:hover {
+            background: rgba(vars.$primary-color, 0.05);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Empty states
+.no-appointments,
+.no-tasks {
+  text-align: center;
+  padding: 2rem;
+  color: vars.$text-secondary;
+  font-size: 0.95rem;
+}
+
+// Loading and error states
+.loading,
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  border-radius: vars.$border-radius;
+  background: white;
+  box-shadow: vars.$shadow-sm;
+}
+
+.error-message {
+  color: vars.$danger-color;
+  background: #fff5f5;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .home-container {
+    padding: 1rem;
+
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

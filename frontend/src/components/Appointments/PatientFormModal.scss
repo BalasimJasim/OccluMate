@@ -1,0 +1,139 @@
+.patient-form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100; // Higher than appointment form
+  padding: 1rem;
+}
+
+.patient-form-modal {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+      color: #2d3748;
+      font-size: 1.25rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #718096;
+      cursor: pointer;
+      padding: 0.5rem;
+      
+      &:hover {
+        color: #4a5568;
+      }
+    }
+  }
+
+  form {
+    padding: 1.5rem;
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 500;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 0.625rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        
+        &:focus {
+          outline: none;
+          border-color: #4299e1;
+          box-shadow: 0 0 0 1px #4299e1;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+
+      button {
+        padding: 0.625rem 1.25rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+
+        &.secondary {
+          background: white;
+          border: 1px solid #e2e8f0;
+          color: #4a5568;
+
+          &:hover {
+            background: #f7fafc;
+          }
+        }
+
+        &.primary {
+          background: #4299e1;
+          border: 1px solid #3182ce;
+          color: white;
+
+          &:hover {
+            background: #3182ce;
+          }
+
+          &:disabled {
+            background: #a0aec0;
+            border-color: #a0aec0;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Add styles for the new patient option in the dropdown
+.add-new-option {
+  color: #4299e1;
+  font-weight: 500;
+  
+  &:hover {
+    background-color: #ebf8ff;
+  }
+}

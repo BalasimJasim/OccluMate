@@ -1,0 +1,213 @@
+// Main appointments page styling
+.appointments-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .appointments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 1.875rem;
+      color: #2d3748;
+      margin: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+
+      .view-toggles {
+        display: flex;
+        gap: 0.5rem;
+        
+        .btn {
+          padding: 0.5rem 1rem;
+          border: 1px solid #e2e8f0;
+          background: white;
+          color: #4a5568;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: #f7fafc;
+          }
+
+          &.active {
+            background: #ebf8ff;
+            border-color: #4299e1;
+            color: #2b6cb0;
+          }
+        }
+      }
+
+      .btn.primary {
+        background: #4299e1;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #3182ce;
+        }
+      }
+    }
+  }
+
+  .appointments-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+
+    // Calendar view specific styles
+    .appointment-calendar {
+      padding: 1rem;
+      
+      .rbc-calendar {
+        min-height: 600px;
+      }
+
+      .rbc-event {
+        background-color: #4299e1;
+        border: none;
+      }
+
+      .rbc-today {
+        background-color: #ebf8ff;
+      }
+    }
+
+    // List view specific styles
+    .appointments-list {
+      padding: 1rem;
+
+      .appointment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #f7fafc;
+        }
+
+        .appointment-info {
+          flex: 1;
+
+          .patient-name {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+          }
+
+          .appointment-time {
+            color: #718096;
+            font-size: 0.875rem;
+          }
+        }
+
+        .appointment-type {
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          font-size: 0.875rem;
+          background: #e2e8f0;
+          color: #4a5568;
+        }
+
+        .appointment-actions {
+          display: flex;
+          gap: 0.5rem;
+          margin-left: 1rem;
+
+          button {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &.edit {
+              background: #ebf8ff;
+              color: #2b6cb0;
+
+              &:hover {
+                background: #bee3f8;
+              }
+            }
+
+            &.delete {
+              background: #fff5f5;
+              color: #c53030;
+
+              &:hover {
+                background: #fed7d7;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Loading and error states
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: #4a5568;
+}
+
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: #c53030;
+  background: #fff5f5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .appointments-page {
+    padding: 1rem;
+
+    .appointments-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+
+      .actions {
+        width: 100%;
+        flex-direction: column;
+
+        .view-toggles {
+          width: 100%;
+          
+          .btn {
+            flex: 1;
+          }
+        }
+
+        .btn.primary {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

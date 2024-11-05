@@ -1,0 +1,26 @@
+@use '../abstract/variables' as vars;
+@use '../abstract/mixins' as mixins;
+
+.dashboard {
+    padding: vars.$container-padding;
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    @include mixins.responsive('md') {
+      padding: vars.$container-padding * 2;
+    }
+    
+    h1 {
+      color: vars.$text-primary;
+      margin-bottom: vars.$spacing-unit * 6;
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      gap: vars.$spacing-unit * 6;
+      
+      @include mixins.responsive('lg') {
+        grid-template-columns: 2fr 1fr;
+      }
+    }
+  }

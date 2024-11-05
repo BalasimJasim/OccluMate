@@ -1,0 +1,199 @@
+@use '@/styles/abstract/variables' as vars;
+@use '@/styles/abstract/mixins' as mix;
+
+.template-form-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  background: white;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-md;
+  overflow-y: auto;
+  z-index: 1000;
+
+  .form-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 1.5rem;
+    border-bottom: 1px solid vars.$border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+      color: vars.$text-primary;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: vars.$text-secondary;
+      cursor: pointer;
+
+      &:hover {
+        color: vars.$text-primary;
+      }
+    }
+  }
+
+  .form-body {
+    padding: 1.5rem;
+
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: vars.$text-primary;
+        font-weight: 500;
+      }
+
+      input, select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid vars.$border-color;
+        border-radius: vars.$border-radius;
+        font-size: 0.875rem;
+
+        &:focus {
+          outline: none;
+          border-color: vars.$primary-color;
+          box-shadow: 0 0 0 2px rgba(vars.$primary-color, 0.1);
+        }
+      }
+    }
+
+    .fields-section, .common-notes-section {
+      margin-bottom: 2rem;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h3 {
+          margin: 0;
+          color: vars.$text-primary;
+        }
+
+        .btn.add {
+          @include mix.button-secondary;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+      }
+    }
+
+    .field-item {
+      background: vars.$bg-secondary;
+      padding: 1rem;
+      border-radius: vars.$border-radius;
+      margin-bottom: 1rem;
+
+      .field-header {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        input {
+          flex: 1;
+        }
+
+        .field-actions {
+          display: flex;
+          gap: 0.5rem;
+
+          button {
+            padding: 0.5rem;
+            border: none;
+            border-radius: vars.$border-radius-sm;
+            background: white;
+            color: vars.$text-secondary;
+            cursor: pointer;
+
+            &:hover {
+              background: vars.$bg-secondary;
+              color: vars.$text-primary;
+            }
+          }
+        }
+      }
+
+      .field-config {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        align-items: center;
+
+        label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        textarea {
+          grid-column: 1 / -1;
+          width: 100%;
+          min-height: 100px;
+          padding: 0.75rem;
+          border: 1px solid vars.$border-color;
+          border-radius: vars.$border-radius;
+          resize: vertical;
+        }
+      }
+    }
+  }
+
+  .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 1.5rem;
+    border-top: 1px solid vars.$border-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: vars.$border-radius;
+      font-weight: 500;
+      cursor: pointer;
+
+      &.secondary {
+        background: white;
+        border: 1px solid vars.$border-color;
+        color: vars.$text-secondary;
+
+        &:hover {
+          background: vars.$bg-secondary;
+        }
+      }
+
+      &.primary {
+        background: vars.$primary-color;
+        color: white;
+        border: none;
+
+        &:hover {
+          background: darken(vars.$primary-color, 5%);
+        }
+      }
+    }
+  }
+}
+
+// Test that mixins are working
+.test {
+    @include mix.button-secondary;
+} 

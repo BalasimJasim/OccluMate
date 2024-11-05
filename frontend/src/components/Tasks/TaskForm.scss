@@ -1,0 +1,141 @@
+@use '../../styles/abstract/variables' as vars;
+@use '../../styles/abstract/mixins' as mix;
+
+.task-form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.task-form-modal {
+  background: white;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-md;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid vars.$border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+      color: vars.$text-primary;
+      font-size: 1.25rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: vars.$text-secondary;
+      cursor: pointer;
+      padding: 0.5rem;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: vars.$text-primary;
+      }
+    }
+  }
+
+  form {
+    padding: 1.5rem;
+
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: vars.$text-primary;
+        font-weight: 500;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid vars.$border-color;
+        border-radius: vars.$border-radius;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: vars.$primary-color;
+          box-shadow: 0 0 0 2px rgba(vars.$primary-color, 0.1);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid vars.$border-color;
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: vars.$border-radius;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.secondary {
+          background: white;
+          border: 1px solid vars.$border-color;
+          color: vars.$text-secondary;
+
+          &:hover {
+            background: vars.$bg-secondary;
+          }
+        }
+
+        &.primary {
+          background: vars.$primary-color;
+          color: white;
+          border: none;
+
+          &:hover {
+            background-color: darken(vars.$primary-color, 5%);
+          }
+
+          &:disabled {
+            background-color: vars.$secondary-color;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .task-form-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
+} 

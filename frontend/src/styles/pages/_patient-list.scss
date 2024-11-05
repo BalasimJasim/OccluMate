@@ -1,0 +1,52 @@
+@use '../abstract/variables' as vars;
+@use '../abstract/mixins' as mixins;
+
+.patient-list {
+    @include mixins.card;
+    
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: vars.$spacing-unit * 6;
+      
+      h2 {
+        color: vars.$text-primary;
+      }
+      
+      .total-patients {
+        color: vars.$text-secondary;
+        font-size: 0.875rem;
+      }
+    }
+    
+    .patient-card {
+      padding: vars.$spacing-unit * 4;
+      border: 1px solid vars.$border-color;
+      border-radius: vars.$border-radius;
+      margin-bottom: vars.$spacing-unit * 4;
+      transition: transform 0.2s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: vars.$shadow-sm;
+      }
+      
+      .patient-name {
+        color: vars.$text-primary;
+        font-weight: 500;
+        margin-bottom: vars.$spacing-unit * 2;
+      }
+      
+      .patient-info {
+        color: vars.$text-secondary;
+        font-size: 0.875rem;
+      }
+    }
+    
+    .pagination {
+      margin-top: vars.$spacing-unit * 6;
+      text-align: center;
+      color: vars.$text-secondary;
+    }
+  }

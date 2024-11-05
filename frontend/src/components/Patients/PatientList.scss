@@ -1,0 +1,213 @@
+.patient-list-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+
+  .patient-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.875rem;
+      color: #2d3748;
+      margin: 0;
+    }
+
+    .search-bar {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 2rem;
+
+      input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.875rem;
+
+        &:focus {
+          outline: none;
+          border-color: #4299e1;
+          box-shadow: 0 0 0 1px #4299e1;
+        }
+      }
+    }
+
+    .total-patients {
+      color: #718096;
+      font-size: 0.875rem;
+    }
+  }
+
+  .patient-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-height: fit-content;
+  }
+
+  .patient-card {
+    height: fit-content;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .patient-info {
+      h3 {
+        color: #2d3748;
+        margin: 0 0 1rem;
+        font-size: 1.25rem;
+      }
+
+      .patient-details {
+        color: #4a5568;
+        font-size: 0.875rem;
+
+        p {
+          margin: 0.5rem 0;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          i {
+            color: #718096;
+            width: 16px;
+          }
+        }
+      }
+    }
+
+    .patient-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+
+      .btn {
+        flex: 1;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.view {
+          background: #ebf8ff;
+          color: #2b6cb0;
+          text-decoration: none;
+
+          &:hover {
+            background: #bee3f8;
+          }
+        }
+
+        &.edit {
+          background: #faf5ff;
+          color: #6b46c1;
+          border: none;
+
+          &:hover {
+            background: #e9d8fd;
+          }
+        }
+
+        &.delete {
+          background: #fff5f5;
+          color: #c53030;
+          border: none;
+
+          &:hover {
+            background: #fed7d7;
+          }
+        }
+
+        i {
+          margin-right: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .patient-list-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: #4a5568;
+
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3182ce;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .patient-list-error {
+    text-align: center;
+    color: #c53030;
+    background: #fff5f5;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+  }
+
+  .no-patients {
+    text-align: center;
+    color: #718096;
+    padding: 3rem;
+    background: #f7fafc;
+    border-radius: 8px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .patient-list-container {
+    padding: 1rem;
+
+    .patient-list-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+
+      .search-bar {
+        max-width: none;
+        margin: 1rem 0;
+      }
+    }
+
+    .patient-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .patient-card {
+      .patient-actions {
+        flex-direction: column;
+
+        .btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

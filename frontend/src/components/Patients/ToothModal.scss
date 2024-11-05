@@ -1,0 +1,153 @@
+.tooth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.tooth-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .tooth-modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+      margin: 0;
+      color: #2D3748;
+      font-size: 1.25rem;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #A0AEC0;
+      cursor: pointer;
+      padding: 0.5rem;
+
+      &:hover {
+        color: #2D3748;
+      }
+    }
+  }
+
+  .tooth-modal-content {
+    padding: 1.5rem;
+
+    .procedures-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .procedure-button {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+        color: #4A5568;
+
+        .procedure-indicator {
+          width: 12px;
+          height: 12px;
+          border-radius: 3px;
+          margin-right: 0.75rem;
+        }
+
+        &:hover {
+          border-color: #CBD5E0;
+          background: #F7FAFC;
+        }
+
+        &.selected {
+          border-color: #4299E1;
+          background: #EBF8FF;
+          color: #2B6CB0;
+        }
+      }
+    }
+
+    .comments-section {
+      h4 {
+        margin: 0 0 0.75rem;
+        color: #2D3748;
+        font-size: 0.875rem;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 6px;
+        resize: vertical;
+        min-height: 100px;
+        font-size: 0.875rem;
+
+        &:focus {
+          outline: none;
+          border-color: #4299E1;
+        }
+      }
+    }
+  }
+
+  .tooth-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #E2E8F0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    button {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.cancel-button {
+        background: white;
+        border: 1px solid #E2E8F0;
+        color: #4A5568;
+
+        &:hover {
+          background: #F7FAFC;
+        }
+      }
+
+      &.save-button {
+        background: #4299E1;
+        border: none;
+        color: white;
+
+        &:hover {
+          background: #3182CE;
+        }
+
+        &:disabled {
+          background: #CBD5E0;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

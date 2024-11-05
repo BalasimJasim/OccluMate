@@ -1,0 +1,7 @@
+{
+  "events": {
+    "restart": "npx kill-port 5000",
+    "crash": "npx kill-port 5000"
+  },
+  "delay": "1500"
+}
