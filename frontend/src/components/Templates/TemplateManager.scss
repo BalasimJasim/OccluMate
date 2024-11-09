@@ -80,7 +80,7 @@
             color: white;
 
             &:hover {
-              background: darken(vars.$secondary-color, 5%);
+              background: color.adjust(vars.$secondary-color, $lightness: -5%);
             }
           }
 
@@ -89,7 +89,7 @@
             color: white;
 
             &:hover {
-              background: darken(vars.$danger-color, 5%);
+              background: color.adjust(vars.$danger-color, $lightness: -5%);
             }
           }
         }

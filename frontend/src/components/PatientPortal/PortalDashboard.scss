@@ -115,7 +115,7 @@
             transition: background-color 0.2s ease;
 
             &:hover {
-              background-color: rgba(vars.$primary-color, 0.1);
+              background-color: color.adjust(vars.$primary-color, $lightness: -5%);
             }
           }
         }

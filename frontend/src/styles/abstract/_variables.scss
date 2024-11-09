@@ -108,8 +108,8 @@ $button-transition: $transition-base;
   borderRadius: $border-radius;
   shadowSm: $shadow-sm;
   fontSizeBase: $font-size-base;
-  cabinet1Color: map-get($cabinet-colors, 'Cabinet-1');
-  cabinet2Color: map-get($cabinet-colors, 'Cabinet-2');
-  cabinet3Color: map-get($cabinet-colors, 'Cabinet-3');
-  cabinet4Color: map-get($cabinet-colors, 'Cabinet-4');
+  cabinet1Color: map.get($cabinet-colors, 'Cabinet-1');
+    cabinet2Color: map.get($cabinet-colors, 'Cabinet-2');
+    cabinet3Color: map.get($cabinet-colors, 'Cabinet-3');
+    cabinet4Color: map.get($cabinet-colors, 'Cabinet-4');
 }
