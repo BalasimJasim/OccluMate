@@ -1,0 +1,121 @@
+/* ToothTooltip.scss */
+.tooth-tooltip {
+    position: absolute;
+    visibility: hidden;
+    z-index: 50;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    width: 240px;
+
+    .tooltip-content {
+        background: rgba(26, 32, 44, 0.95);
+        color: white;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        .section {
+            margin-bottom: 8px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .section-title {
+                font-weight: 600;
+                margin-bottom: 4px;
+
+                &.procedures {
+                    color: #90cdf4; // Light blue
+                }
+
+                &.notes {
+                    color: #9ae6b4; // Light green
+                }
+            }
+
+            .section-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                li {
+                    font-size: 0.75rem;
+                    margin-bottom: 2px;
+                    line-height: 1.4;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+
+        // Tooltip arrow
+        &::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -4px;
+            transform: translateX(-50%) rotate(45deg);
+            width: 8px;
+            height: 8px;
+            background: inherit;
+        }
+    }
+}
+
+// Parent hover state
+.tooth-wrapper {
+    position: relative;
+
+    &:hover {
+        .tooth-tooltip {
+            visibility: visible;
+        }
+    }
+}
+
+// Additional status indicators
+.tooth-status {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &.active-treatment {
+        background: #f56565;
+        animation: pulse 2s infinite;
+    }
+
+    &.needs-attention {
+        background: #ecc94b;
+        animation: pulse 2s infinite;
+    }
+
+    &.completed {
+        background: #48bb78;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
