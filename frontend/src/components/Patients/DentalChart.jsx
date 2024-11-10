@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './DentalChart.scss';
 import ToothModal from './ToothModal';
-import ToothTooltip from "./ToothTooltip";
+import ToothTooltip from "./ToothToolTip";
 
 const DentalChart = ({ patientId, initialData, onUpdate }) => {
   // State declarations
