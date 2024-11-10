@@ -1,5 +1,6 @@
 @use '@/styles/abstract/variables' as vars;
 @use '@/styles/abstract/mixins' as mix;
+@use "sass:color";
 
 .template-form-modal {
   position: fixed;
