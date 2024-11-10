@@ -1,6 +1,6 @@
 @use '../abstract/variables' as vars;
 @use '../abstract/mixins' as mix;
-
+@use "sass:color";
 .home-container {
   padding: 2rem;
   max-width: 1200px;
@@ -108,7 +108,7 @@
         }
 
         &:hover {
-          background-color: darken(vars.$primary-color, 5%);
+          background-color: color.adjust(vars.$primary-color, 5%);
           transform: translateY(-1px);
         }
 

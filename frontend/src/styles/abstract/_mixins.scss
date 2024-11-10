@@ -1,6 +1,6 @@
 @use "sass:map";
 @use "./variables" as vars;
-
+@use "sass:color";
 
 @mixin flex-center {
     display: flex;
@@ -53,7 +53,7 @@
     color: white;
     
     &:hover {
-        background: darken(vars.$primary-color, 5%);
+        background: color.adjust(vars.$primary-color, 5%);
     }
 }
 

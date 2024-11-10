@@ -186,7 +186,7 @@
         border: none;
 
         &:hover {
-          background: darken(vars.$primary-color, 5%);
+          background: color.adjust(vars.$primary-color, 5%);
         }
       }
     }
