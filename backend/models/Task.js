@@ -57,4 +57,4 @@ taskSchema.index({ assignedTo: 1, status: 1 });
 taskSchema.index({ 'relatedTo.type': 1, 'relatedTo.id': 1 });
 
 export default mongoose.model('Task', taskSchema);
-//needs some work
+//needs some work. there are issues
