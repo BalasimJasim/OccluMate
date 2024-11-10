@@ -1,8 +1,6 @@
 import axios from 'axios';
-import moment from 'moment';
-import dotenv from "dotenv";
+import moment from "moment";
 
-dotenv.config();
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   headers: {
