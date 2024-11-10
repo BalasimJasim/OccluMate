@@ -50,6 +50,10 @@ app.use(express.json({
 }));
 app.use(morgan('dev')); 
 
+app.get("/", (req, res) => {
+  res.send("Welcome to OccluMate!");
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes); 
