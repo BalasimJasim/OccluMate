@@ -119,7 +119,7 @@
           border: none;
 
           &:hover {
-            background-color: color.adjust(vars.$primary-color, 5%);
+            background-color: color.adjust(vars.$primary-color, $lightness: 5%);
           }
 
           &:disabled {

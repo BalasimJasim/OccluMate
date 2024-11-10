@@ -72,7 +72,7 @@
             color: white;
 
             &:hover {
-              background: color.adjust(vars.$primary-color, 5%);
+              background: color.adjust(vars.$primary-color, $lightness: 5%);
             }
           }
 

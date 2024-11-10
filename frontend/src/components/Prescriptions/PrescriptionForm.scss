@@ -133,7 +133,7 @@
           transition: background-color 0.2s ease;
 
           &:hover {
-            background-color: color.adjust(vars.$danger-color, 5%);
+            background-color: color.adjust(vars.$danger-color, $lightness: 5%);
           }
         }
       }
@@ -157,7 +157,7 @@
         margin-bottom: 1.5rem;
 
         &:hover {
-          background-color: color.adjust(vars.$secondary-color, 5%);
+          background-color: color.adjust(vars.$secondary-color, $lightness: 5%);
         }
       }
 
@@ -200,7 +200,7 @@
           border: none;
 
           &:hover {
-            background-color: color.adjust(vars.$primary-color, 5%);
+            background-color: color.adjust(vars.$primary-color, $lightness: 5%);
           }
 
           &:disabled {
