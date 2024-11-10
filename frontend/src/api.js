@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 
-// Create an instance of axios with default settings
+
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
   headers: {
