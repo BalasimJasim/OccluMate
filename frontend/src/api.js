@@ -1,14 +1,14 @@
 import axios from 'axios';
 import moment from 'moment';
+import dotenv from "dotenv";
 
-
+dotenv.config();
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
+  baseURL: process.env.REACT_APP_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
-console.log("API URL:", process.env.REACT_APP_API_URL);
 
 // Add request interceptor for logging and token handling
 api.interceptors.request.use(
@@ -270,6 +270,5 @@ export const getAppointmentById = async (id) => {
     throw error;
   }
 };
-
 
 export default api;
