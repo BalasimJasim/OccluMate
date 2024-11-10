@@ -1,5 +1,6 @@
 @use '../abstract/variables' as vars;
 @use '../abstract/mixins' as mix;
+@use "sass:color";
 
 .navbar {
   background-color: vars.$bg-primary;
