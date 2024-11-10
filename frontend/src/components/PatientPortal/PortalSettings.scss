@@ -1,6 +1,6 @@
 @use '@/styles/abstract/variables' as vars;
 @use '@/styles/abstract/mixins' as mix;
-
+@use "sass:color";
 .portal-settings {
   padding: 2rem;
   background: white;
