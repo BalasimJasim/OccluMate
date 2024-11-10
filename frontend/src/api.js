@@ -229,4 +229,6 @@ export const getAppointmentById = async (id) => {
   }
 };
 
+console.log("API URL:", process.env.REACT_APP_API_URL);
+
 export default api;
