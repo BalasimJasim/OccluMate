@@ -3,3 +3,4 @@ node_modules/
 bookAppointment.txt
 instructions.txt
 patientPortalInstructions.txt
+.vercel
