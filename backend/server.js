@@ -25,25 +25,55 @@ connectDB();
 const app = express();
 
 // Enhanced security with helmet
-app.use(helmet());
-
-// CORS configuration
 app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5174",
-      "http://localhost:5173",
-      "https://occlu-mate.vercel.app", // Add your Vercel frontend URL
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   })
 );
 
-// Add this before your routes
-app.options("*", cors()); // Enable pre-flight for all routes
+// CORS Configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "http://localhost:4173",
+      "http://localhost:4174",
+      "http://localhost:4175",
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://occlumate.onrender.com",
+      "https://occlumate.vercel.app",
+    ];
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log("Blocked origin:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+  ],
+  exposedHeaders: ["Content-Length", "X-Requested-With"],
+  maxAge: 86400,
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options("*", cors(corsOptions));
 
 // Middleware
 app.use(

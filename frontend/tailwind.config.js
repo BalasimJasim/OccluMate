@@ -1,5 +1,11 @@
+/** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./src/components/**/*.{js,jsx,ts,tsx}",
+    "./src/pages/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
@@ -27,35 +33,8 @@ export default {
           "sans-serif",
         ],
       },
-      spacing: {
-        xs: "calc(0.25 * 1rem)",
-        sm: "calc(0.5 * 1rem)",
-        md: "1rem",
-        lg: "calc(1.5 * 1rem)",
-        xl: "calc(2 * 1rem)",
-      },
-      borderRadius: {
-        DEFAULT: "0.25rem",
-      },
-      borderWidth: {
-        DEFAULT: "1px",
-      },
-      boxShadow: {
-        sm: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)",
-        DEFAULT: "0 0.5rem 1rem rgba(0, 0, 0, 0.15)",
-        lg: "0 1rem 3rem rgba(0, 0, 0, 0.175)",
-      },
-      screens: {
-        sm: "576px",
-        md: "768px",
-        lg: "992px",
-        xl: "1200px",
-      },
-      backgroundImage: {
-        "auth-gradient": "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-        "button-gradient": "linear-gradient(to right, #007bff, #00bcd4)",
-      },
     },
   },
   plugins: [],
+  darkMode: "class",
 };

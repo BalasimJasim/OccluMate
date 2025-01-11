@@ -20,10 +20,26 @@ export default defineConfig({
     postcss: {
       plugins: [tailwindcss, autoprefixer],
     },
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@styles/variables.scss";`,
+      },
+    },
   },
   build: {
     outDir: "dist",
     assetsDir: "assets",
+    sourcemap: true,
+    minify: "terser",
+    cssMinify: true,
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
   },
   server: {
     port: 5173,

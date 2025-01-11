@@ -2,29 +2,80 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+  withCredentials: true,
+  timeout: 10000,
 });
 
-// Add request interceptor to include auth token
 api.interceptors.request.use(
-  (config) => {
+  function (config) {
+    console.log("[API] Making request to:", config.url);
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  function (error) {
+    console.error("[API] Request error:", error);
+    return Promise.reject(error);
+  }
 );
 
-// Add response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("[API] Response received:", {
+      url: response.config.url,
+      status: response.status,
+    });
+    return response;
+  },
   (error) => {
+    console.error("[API] Response error:", {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message,
+    });
+
     if (error.response?.status === 401) {
+      console.log("[API] Unauthorized, clearing token");
       localStorage.removeItem("token");
       window.location.href = "/login";
+      return Promise.reject({
+        message: "Session expired. Please login again.",
+      });
     }
-    return Promise.reject(error);
+
+    if (error.code === "ERR_NETWORK" && error.message.includes("CORS")) {
+      console.error("[API] CORS error:", error);
+      return Promise.reject({
+        message: "Unable to connect to the server. CORS error.",
+      });
+    }
+
+    if (error.code === "ERR_NETWORK") {
+      console.error("[API] Network error:", error);
+      return Promise.reject({
+        message:
+          "Unable to connect to the server. Please check your internet connection.",
+      });
+    }
+
+    if (error.code === "ECONNABORTED") {
+      console.error("[API] Request timeout:", error);
+      return Promise.reject({
+        message: "Request timed out. Please try again.",
+      });
+    }
+
+    return Promise.reject(
+      error.response?.data || {
+        message: "An unexpected error occurred.",
+      }
+    );
   }
 );
 
