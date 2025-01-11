@@ -1,155 +1,142 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import './ToothModal.scss';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { FaTimes } from "react-icons/fa";
 
-const PROCEDURES = {
-  surface: [
-    { id: 'caries', name: 'Caries', color: '#F56565' },
-    { id: 'filling', name: 'Filling', color: '#4299E1' },
-    { id: 'periodontal', name: 'Periodontal', color: '#48BB78' }
-  ],
-  structural: {
-    crown: [
-      { id: 'crown', name: 'Crown', color: '#ECC94B' },
-      { id: 'bridge', name: 'Bridge', color: '#C53030' }
-    ],
-    root: [
-      { id: 'rootcanal', name: 'Root Canal', color: '#B83280' },
-      { id: 'implant', name: 'Implant', color: '#2B6CB0' }
-    ],
-    full: [
-      { id: 'missing', name: 'Missing Tooth', color: '#718096' }
-    ]
-  }
-};
-
-const ToothModal = ({ 
-  toothNumber, 
-  surface, 
-  toothData = {}, 
-  onClose, 
-  onSave, 
-  isStructural = false
-}) => {
-  const [selectedProcedure, setSelectedProcedure] = useState(() => {
-    if (isStructural) {
-      if (surface === 'full') return toothData.full || '';
-      return toothData[surface] || '';
-    }
-    return toothData[surface] || '';
+const ToothModal = ({ tooth, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    status: tooth?.status || "healthy",
+    notes: tooth?.notes || "",
+    procedures: tooth?.procedures || [],
   });
-  const [comment, setComment] = useState(toothData.comments?.[surface] || '');
 
-  const getAvailableProcedures = () => {
-    if (!isStructural) return PROCEDURES.surface;
-    
-    switch(surface) {
-      case 'full': return PROCEDURES.structural.full;
-      case 'crown': return PROCEDURES.structural.crown;
-      case 'root': return PROCEDURES.structural.root;
-      default: return [];
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({ ...tooth, ...formData });
   };
-
-  const availableProcedures = getAvailableProcedures();
-
-  const handleSave = () => {
-    onSave(selectedProcedure, comment);
-    onClose();
-  };
-
-  const isMissing = toothData.full === 'missing';
-
-  // Prevent opening modal for missing teeth in surface view
-  useEffect(() => {
-    if (!isStructural && isMissing) {
-      onClose();
-    }
-  }, [isStructural, isMissing, onClose]);
-
-  // If tooth is missing and we're in surface view, don't render the modal
-  if (!isStructural && isMissing) {
-    return null;
-  }
 
   return (
-    <div className="tooth-modal-overlay" onClick={onClose}>
-      <div className="tooth-modal" onClick={e => e.stopPropagation()}>
-        <div className="tooth-modal-header">
-          <h3>Tooth {toothNumber} - {surface}</h3>
-          <button className="close-button" onClick={onClose}>&times;</button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Tooth {tooth.number} Details
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="tooth-modal-content">
-          {(toothData[surface] || (surface === 'full' && toothData.full)) && (
-            <div className="remove-procedure-container">
-              <button 
-                className="remove-procedure-button"
-                onClick={() => {
-                  if (surface === 'full') {
-                    onSave(null, '');
-                  } else {
-                    onSave({ [surface]: null });
-                  }
-                  onClose();
-                }}
-              >
-                Remove Current Procedure
-              </button>
-            </div>
-          )}
-
-          <div className="procedures-grid">
-            {availableProcedures.map(procedure => (
-              <button
-                key={procedure.id}
-                className={`procedure-button ${selectedProcedure === procedure.id ? 'selected' : ''}`}
-                onClick={() => setSelectedProcedure(procedure.id)}
-              >
-                <span 
-                  className="procedure-indicator"
-                  style={{ backgroundColor: procedure.color }}
-                />
-                {procedure.name}
-              </button>
-            ))}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value })
+              }
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            >
+              <option value="healthy">Healthy</option>
+              <option value="decayed">Decayed</option>
+              <option value="filled">Filled</option>
+              <option value="missing">Missing</option>
+              <option value="crown">Crown</option>
+            </select>
           </div>
 
-          <div className="comments-section">
-            <h4>Add New Comment:</h4>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Notes
+            </label>
             <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add your comments here..."
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               rows={4}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Add any notes about this tooth"
             />
           </div>
-        </div>
 
-        <div className="tooth-modal-footer">
-          <button className="cancel-button" onClick={onClose}>
-            Cancel
-          </button>
-          <button 
-            className="save-button"
-            onClick={handleSave}
-            disabled={!selectedProcedure && !comment.trim()}
-          >
-            Save
-          </button>
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Procedures
+            </label>
+            <div className="space-y-2">
+              {formData.procedures.map((procedure, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
+                >
+                  <span className="text-sm text-gray-700">{procedure}</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        procedures: formData.procedures.filter(
+                          (_, i) => i !== index
+                        ),
+                      })
+                    }
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <FaTimes className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData({
+                    ...formData,
+                    procedures: [...formData.procedures, "New Procedure"],
+                  })
+                }
+                className="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors duration-200"
+              >
+                Add Procedure
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 };
 
 ToothModal.propTypes = {
-  toothNumber: PropTypes.number.isRequired,
-  surface: PropTypes.string.isRequired,
-  toothData: PropTypes.object,
+  tooth: PropTypes.shape({
+    number: PropTypes.number.isRequired,
+    status: PropTypes.string,
+    notes: PropTypes.string,
+    procedures: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  isStructural: PropTypes.bool
 };
 
 export default ToothModal;

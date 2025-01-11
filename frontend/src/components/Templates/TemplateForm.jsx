@@ -1,33 +1,24 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { FaPlus, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import './TemplateForm.scss';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { FaTimes } from "react-icons/fa";
 
-const FIELD_TYPES = ['text', 'number', 'checkbox', 'select', 'date', 'textarea'];
-const CATEGORIES = ['examination', 'procedure', 'treatment', 'followup'];
-
-const TemplateForm = ({ template, onSave, onCancel }) => {
-  const [formData, setFormData] = useState(template || {
-    name: '',
-    category: CATEGORIES[0],
-    fields: [],
-    commonNotes: []
+const TemplateForm = ({ template, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    name: template?.name || "",
+    description: template?.description || "",
+    fields: template?.fields || [],
   });
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
   const handleAddField = () => {
-    setFormData(prev => ({
-      ...prev,
-      fields: [
-        ...prev.fields,
-        {
-          label: '',
-          type: 'text',
-          required: false,
-          options: [],
-          defaultValue: ''
-        }
-      ]
-    }));
+    setFormData({
+      ...formData,
+      fields: [...formData.fields, { name: "", type: "text", required: false }],
+    });
   };
 
   const handleFieldChange = (index, field, value) => {
@@ -36,204 +27,170 @@ const TemplateForm = ({ template, onSave, onCancel }) => {
     setFormData({ ...formData, fields: newFields });
   };
 
-  const handleMoveField = (index, direction) => {
-    const newFields = [...formData.fields];
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    [newFields[index], newFields[newIndex]] = [newFields[newIndex], newFields[index]];
-    setFormData({ ...formData, fields: newFields });
-  };
-
-  const handleAddCommonNote = () => {
-    setFormData(prev => ({
-      ...prev,
-      commonNotes: [...prev.commonNotes, { text: '', category: '' }]
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
+  const handleRemoveField = (index) => {
+    setFormData({
+      ...formData,
+      fields: formData.fields.filter((_, i) => i !== index),
+    });
   };
 
   return (
-    <div className="template-form-modal">
-      <form onSubmit={handleSubmit}>
-        <div className="form-header">
-          <h2>{template ? 'Edit Template' : 'New Template'}</h2>
-          <button type="button" className="close-btn" onClick={onCancel}>&times;</button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {template ? "Edit Template" : "New Template"}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="form-body">
-          <div className="form-group">
-            <label>Template Name</label>
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Template Name
+            </label>
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Enter template name"
             />
           </div>
 
-          <div className="form-group">
-            <label>Category</label>
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            >
-              {CATEGORIES.map(category => (
-                <option key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </option>
-              ))}
-            </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Enter template description"
+            />
           </div>
 
-          <div className="fields-section">
-            <div className="section-header">
-              <h3>Fields</h3>
-              <button type="button" className="btn add" onClick={handleAddField}>
-                <FaPlus /> Add Field
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Fields
+              </label>
+              <button
+                type="button"
+                onClick={handleAddField}
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Add Field
               </button>
             </div>
 
-            {formData.fields.map((field, index) => (
-              <div key={index} className="field-item">
-                <div className="field-header">
-                  <input
-                    type="text"
-                    value={field.label}
-                    onChange={(e) => handleFieldChange(index, 'label', e.target.value)}
-                    placeholder="Field Label"
-                    required
-                  />
-                  <div className="field-actions">
-                    {index > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleMoveField(index, 'up')}
-                        title="Move Up"
-                      >
-                        <FaArrowUp />
-                      </button>
-                    )}
-                    {index < formData.fields.length - 1 && (
-                      <button
-                        type="button"
-                        onClick={() => handleMoveField(index, 'down')}
-                        title="Move Down"
-                      >
-                        <FaArrowDown />
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const newFields = formData.fields.filter((_, i) => i !== index);
-                        setFormData({ ...formData, fields: newFields });
-                      }}
-                      title="Remove Field"
-                    >
-                      <FaTrash />
-                    </button>
+            <div className="space-y-4">
+              {formData.fields.map((field, index) => (
+                <div
+                  key={index}
+                  className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg"
+                >
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={field.name}
+                      onChange={(e) =>
+                        handleFieldChange(index, "name", e.target.value)
+                      }
+                      placeholder="Field Name"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    />
                   </div>
-                </div>
 
-                <div className="field-config">
-                  <select
-                    value={field.type}
-                    onChange={(e) => handleFieldChange(index, 'type', e.target.value)}
-                  >
-                    {FIELD_TYPES.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
+                  <div className="w-40">
+                    <select
+                      value={field.type}
+                      onChange={(e) =>
+                        handleFieldChange(index, "type", e.target.value)
+                      }
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    >
+                      <option value="text">Text</option>
+                      <option value="number">Number</option>
+                      <option value="date">Date</option>
+                      <option value="checkbox">Checkbox</option>
+                      <option value="select">Select</option>
+                    </select>
+                  </div>
 
-                  <label>
+                  <div className="flex items-center">
                     <input
                       type="checkbox"
                       checked={field.required}
-                      onChange={(e) => handleFieldChange(index, 'required', e.target.checked)}
+                      onChange={(e) =>
+                        handleFieldChange(index, "required", e.target.checked)
+                      }
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    Required
-                  </label>
+                    <label className="ml-2 text-sm text-gray-700">
+                      Required
+                    </label>
+                  </div>
 
-                  {field.type === 'select' && (
-                    <textarea
-                      value={field.options.join('\n')}
-                      onChange={(e) => handleFieldChange(
-                        index,
-                        'options',
-                        e.target.value.split('\n').filter(Boolean)
-                      )}
-                      placeholder="Enter options (one per line)"
-                    />
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveField(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <FaTimes className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="common-notes-section">
-            <div className="section-header">
-              <h3>Common Notes</h3>
-              <button type="button" className="btn add" onClick={handleAddCommonNote}>
-                <FaPlus /> Add Common Note
-              </button>
+              ))}
             </div>
-
-            {formData.commonNotes.map((note, index) => (
-              <div key={index} className="note-item">
-                <input
-                  type="text"
-                  value={note.category}
-                  onChange={(e) => {
-                    const newNotes = [...formData.commonNotes];
-                    newNotes[index].category = e.target.value;
-                    setFormData({ ...formData, commonNotes: newNotes });
-                  }}
-                  placeholder="Note Category"
-                />
-                <textarea
-                  value={note.text}
-                  onChange={(e) => {
-                    const newNotes = [...formData.commonNotes];
-                    newNotes[index].text = e.target.value;
-                    setFormData({ ...formData, commonNotes: newNotes });
-                  }}
-                  placeholder="Enter common note text"
-                />
-                <button
-                  type="button"
-                  className="btn remove"
-                  onClick={() => {
-                    const newNotes = formData.commonNotes.filter((_, i) => i !== index);
-                    setFormData({ ...formData, commonNotes: newNotes });
-                  }}
-                >
-                  <FaTrash />
-                </button>
-              </div>
-            ))}
           </div>
-        </div>
 
-        <div className="form-actions">
-          <button type="button" className="btn secondary" onClick={onCancel}>
-            Cancel
-          </button>
-          <button type="submit" className="btn primary">
-            Save Template
-          </button>
-        </div>
-      </form>
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              {template ? "Update Template" : "Create Template"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
 
 TemplateForm.propTypes = {
-  template: PropTypes.object,
+  template: PropTypes.shape({
+    name: PropTypes.string,
+    description: PropTypes.string,
+    fields: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string,
+        type: PropTypes.string,
+        required: PropTypes.bool,
+      })
+    ),
+  }),
+  onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired
 };
 
-export default TemplateForm; 
+export default TemplateForm;

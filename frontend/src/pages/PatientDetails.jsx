@@ -1,36 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import DentalChart from '../components/Patients/DentalChart';
-import { getPatientById, getDentalChart, updateDentalChart } from '../api';
-import './PatientDetails.scss';
-import MedicalRecord from '../components/Patients/MedicalRecord';
-import FullScreenModal from '../components/common/FullScreenModal';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import DentalChart from "../components/Patients/DentalChart";
+import { getPatientById, getDentalChart, updateDentalChart } from "../api";
+import MedicalRecord from "../components/Patients/MedicalRecord";
+import FullScreenModal from "../components/common/FullScreenModal";
 
 const PatientDetails = () => {
   const { id } = useParams();
   const [patient, setPatient] = useState(null);
   const [dentalChart, setDentalChart] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('info');
+  const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("info");
   const [showDentalChartModal, setShowDentalChartModal] = useState(false);
 
   const fetchPatientData = async () => {
     try {
-      console.log('Fetching data for patient ID:', id);
-      
+      console.log("Fetching data for patient ID:", id);
+
       const [patientRes, chartRes] = await Promise.all([
         getPatientById(id),
-        getDentalChart(id)
+        getDentalChart(id),
       ]);
 
-      console.log('Patient Response:', patientRes);
-      console.log('Dental Chart Response:', chartRes);
+      console.log("Patient Response:", patientRes);
+      console.log("Dental Chart Response:", chartRes);
 
       if (patientRes.data) {
         setPatient(patientRes.data);
       } else {
-        setError('Patient data not found');
+        setError("Patient data not found");
       }
 
       if (chartRes.data) {
@@ -39,8 +38,8 @@ const PatientDetails = () => {
 
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching patient data:', err);
-      setError('Failed to load patient data');
+      console.error("Error fetching patient data:", err);
+      setError("Failed to load patient data");
       setLoading(false);
     }
   };
@@ -57,61 +56,102 @@ const PatientDetails = () => {
       const updatedChart = await getDentalChart(patientId);
       setDentalChart(updatedChart.data?.chartData || {});
     } catch (error) {
-      console.error('Error updating dental chart:', error);
+      console.error("Error updating dental chart:", error);
     }
   };
 
-  if (loading) return <div className="loading">Loading patient details...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-  if (!patient) return <div className="error-message">Patient not found</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center p-8 text-gray-600">
+        Loading patient details...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="mx-auto max-w-2xl mt-8 p-4 bg-red-50 text-red-600 rounded-md">
+        {error}
+      </div>
+    );
+  if (!patient)
+    return (
+      <div className="mx-auto max-w-2xl mt-8 p-4 bg-red-50 text-red-600 rounded-md">
+        Patient not found
+      </div>
+    );
 
   return (
-    <div className="patient-details">
-      <div className="patient-header">
-        <div className="patient-info">
-          <h1>{patient.name}</h1>
-          <div className="patient-meta">
+    <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="space-y-4">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            {patient.name}
+          </h1>
+          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
             <span>Email: {patient.email}</span>
-            <span>Phone: {patient.phone}</span>
-            <span>Age: {patient.age}</span>
+            <span className="border-l border-gray-300 pl-4">
+              Phone: {patient.phone}
+            </span>
+            <span className="border-l border-gray-300 pl-4">
+              Age: {patient.age}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="tabs">
-        <button
-          className={`tab ${activeTab === 'info' ? 'active' : ''}`}
-          onClick={() => setActiveTab('info')}
-        >
-          Basic Info
-        </button>
-        <button
-          className={`tab ${activeTab === 'dental-chart' ? 'active' : ''}`}
-          onClick={() => setShowDentalChartModal(true)}
-        >
-          Dental Chart
-        </button>
-        <button
-          className={`tab ${activeTab === 'medical-record' ? 'active' : ''}`}
-          onClick={() => setActiveTab('medical-record')}
-        >
-          Medical Record
-        </button>
+      <div className="border-b border-gray-200">
+        <nav className="flex space-x-8" aria-label="Tabs">
+          {[
+            { id: "info", label: "Basic Info" },
+            { id: "dental-chart", label: "Dental Chart" },
+            { id: "medical-record", label: "Medical Record" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() =>
+                tab.id === "dental-chart"
+                  ? setShowDentalChartModal(true)
+                  : setActiveTab(tab.id)
+              }
+              className={`py-4 px-1 inline-flex items-center border-b-2 font-medium text-sm
+                ${
+                  activeTab === tab.id
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      <div className="tab-content">
-        {activeTab === 'info' && (
-          <div className="info-section">
-            <h3>Contact Information</h3>
-            <p><strong>Address:</strong> {patient.address.street}, {patient.address.city}, {patient.address.zip}</p>
-            <p><strong>Email:</strong> {patient.email}</p>
-            <p><strong>Phone:</strong> {patient.phone}</p>
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        {activeTab === "info" && (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Contact Information
+              </h3>
+              <div className="space-y-3 text-gray-600">
+                <p>
+                  <span className="font-medium text-gray-900">Address:</span>{" "}
+                  {patient.address.street}, {patient.address.city},{" "}
+                  {patient.address.zip}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Email:</span>{" "}
+                  {patient.email}
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Phone:</span>{" "}
+                  {patient.phone}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
-        {activeTab === 'medical-record' && (
-          <MedicalRecord patientId={id} />
-        )}
+        {activeTab === "medical-record" && <MedicalRecord patientId={id} />}
       </div>
 
       <FullScreenModal

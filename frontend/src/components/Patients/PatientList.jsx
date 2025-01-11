@@ -3,16 +3,24 @@ import { Link } from 'react-router-dom';
 import { getAllPatients, deletePatient } from '../../api';
 import ConfirmDialog from '../common/ConfirmDialog';
 import PatientEditModal from './PatientEditModal';
-import './PatientList.scss';
+import {
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
 
 const PatientList = () => {
-  // Initialize patients as an empty array
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, patient: null });
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    show: false,
+    patient: null,
+  });
   const [editModal, setEditModal] = useState({ show: false, patient: null });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchPatients = async () => {
     try {
@@ -22,8 +30,8 @@ const PatientList = () => {
       setPatients(response.data);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch patients. Please try again later.');
-      console.error('Error fetching patients:', err);
+      setError("Failed to fetch patients. Please try again later.");
+      console.error("Error fetching patients:", err);
     } finally {
       setLoading(false);
     }
@@ -49,13 +57,14 @@ const PatientList = () => {
         await fetchPatients();
         setDeleteConfirm({ show: false, patient: null });
       } else {
-        setError(response.data.message || 'Failed to delete patient');
+        setError(response.data.message || "Failed to delete patient");
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to delete patient';
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete patient";
       setError(errorMessage);
-      console.error('Error deleting patient:', err);
-      
+      console.error("Error deleting patient:", err);
+
       // Show error in UI for 3 seconds
       setTimeout(() => {
         setError(null);
@@ -69,76 +78,94 @@ const PatientList = () => {
   };
 
   // Filter patients based on search term
-  const filteredPatients = patients.filter(patient => 
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.phone.includes(searchTerm)
+  const filteredPatients = patients.filter(
+    (patient) =>
+      patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.phone.includes(searchTerm)
   );
 
   if (loading) {
     return (
-      <div className="patient-list-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading patients...</p>
+      <div className="flex flex-col items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p className="mt-4 text-gray-600">Loading patients...</p>
       </div>
     );
   }
 
   if (error) {
-    return <div className="patient-list-error">{error}</div>;
+    return <div className="p-4 bg-red-50 text-red-700 rounded-md">{error}</div>;
   }
 
   return (
-    <div className="patient-list-container">
-      <div className="patient-list-header">
-        <h2>Patient List</h2>
-        <div className="search-bar">
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0">
+        <h2 className="text-2xl font-bold text-gray-900">Patient List</h2>
+        <div className="w-full md:w-64">
           <input
             type="text"
             placeholder="Search patients..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        <div className="total-patients">
+        <div className="text-sm text-gray-600">
           Total Patients: {patients.length}
         </div>
       </div>
 
       {filteredPatients.length === 0 ? (
-        <div className="no-patients">
-          <p>No patients found.</p>
+        <div className="text-center py-12">
+          <p className="text-gray-500">No patients found.</p>
         </div>
       ) : (
-        <div className="patient-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPatients.map((patient) => (
-            <div key={patient._id} className="patient-card">
-              <div className="patient-info">
-                <h3>{patient.name}</h3>
-                <div className="patient-details">
-                  <p><i className="fas fa-envelope"></i> {patient.email}</p>
-                  <p><i className="fas fa-phone"></i> {patient.phone}</p>
-                  <p><i className="fas fa-map-marker-alt"></i> {patient.address.city}</p>
+            <div
+              key={patient._id}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+            >
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  {patient.name}
+                </h3>
+                <div className="space-y-2">
+                  <p className="flex items-center text-gray-600">
+                    <FaEnvelope className="w-4 h-4 mr-2" />
+                    {patient.email}
+                  </p>
+                  <p className="flex items-center text-gray-600">
+                    <FaPhone className="w-4 h-4 mr-2" />
+                    {patient.phone}
+                  </p>
+                  <p className="flex items-center text-gray-600">
+                    <FaMapMarkerAlt className="w-4 h-4 mr-2" />
+                    {patient.address.city}
+                  </p>
                 </div>
               </div>
-              <div className="patient-actions">
-                <Link 
-                  to={`/patients/${patient._id}`} 
-                  className="btn view"
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 space-x-3">
+                <Link
+                  to={`/patients/${patient._id}`}
+                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   View Details
                 </Link>
                 <button
                   onClick={() => handleEdit(patient)}
-                  className="btn edit"
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  <i className="fas fa-edit"></i> Edit
+                  <FaEdit className="w-4 h-4 mr-1.5" />
+                  Edit
                 </button>
                 <button
                   onClick={() => handleDelete(patient)}
-                  className="btn delete"
+                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
-                  <i className="fas fa-trash"></i> Delete
+                  <FaTrash className="w-4 h-4 mr-1.5" />
+                  Delete
                 </button>
               </div>
             </div>

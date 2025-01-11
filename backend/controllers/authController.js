@@ -1,197 +1,163 @@
-import User from '../models/User.js';
-import jwt from 'jsonwebtoken';
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import Patient from '../models/Patient.js';
+import Patient from "../models/Patient.js";
+import asyncHandler from "express-async-handler";
 
-// Generate JWT Token
+// Generate JWT
 const generateToken = (id) => {
-  try {
-    console.log('Generating token for id:', id);
-    const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    console.log('Generated token:', token);
-    return token;
-  } catch (error) {
-    console.error('Error generating token:', error);
-    throw error;
-  }
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 };
 
-// Login User
-export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    console.log('Login attempt for email:', email);
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
+const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ 
-        message: 'Please provide both email and password' 
-      });
-    }
+  // Check for user email
+  const user = await User.findOne({ email }).select("+password");
 
-    const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
 
-    if (!user) {
-      console.log('User not found for email:', email);
-      return res.status(401).json({ 
-        message: 'Invalid email or password',
-        detail: 'No user found with this email' 
-      });
-    }
+  // Check password
+  const isMatch = await user.matchPassword(password);
 
-    console.log('User found:', user._id);
+  if (!isMatch) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
 
-    if (!user.password) {
-      console.log('User has no password hash stored');
-      return res.status(500).json({ 
-        message: 'User account is not properly set up',
-        detail: 'No password hash found' 
-      });
-    }
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id),
+  });
+});
 
-    const isPasswordValid = await user.matchPassword(password);
+// @desc    Register new user
+// @route   POST /api/auth/register
+// @access  Public
+const register = asyncHandler(async (req, res) => {
+  const { name, email, password, role } = req.body;
 
-    if (!isPasswordValid) {
-      console.log('Invalid password for user:', user._id);
-      return res.status(401).json({ 
-        message: 'Invalid email or password',
-        detail: 'Password does not match' 
-      });
-    }
+  // Check if user exists
+  const userExists = await User.findOne({ email });
 
-    const token = generateToken(user._id);
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
 
-    const userResponse = {
-      _id: user._id.toString(),
+  // Create user
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role,
+  });
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
-    };
-
-    console.log('Login successful for user:', user._id);
-    res.json({ 
-      token, 
-      user: userResponse
+      role: user.role,
+      token: generateToken(user._id),
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ 
-      message: 'An error occurred during login',
-      detail: error.message 
-    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
   }
-};
+});
 
-// Register User
-export const register = async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
-    console.log('Registration attempt with:', { name, email, role });
+// @desc    Login patient
+// @route   POST /api/auth/patient-login
+// @access  Public
+const patientLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
+  // Check for patient email
+  const patient = await Patient.findOne({ email }).select("+password");
 
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    // Validate role
-    const validRoles = ['Admin', 'Dentist', 'Receptionist'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({ 
-        message: 'Invalid role',
-        validRoles,
-        receivedRole: role
-      });
-    }
-
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role
-    });
-
-    if (user) {
-      console.log('Created user:', {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      });
-
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
-    }
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ 
-      message: error.message,
-      details: error.stack
-    });
+  if (!patient) {
+    res.status(401);
+    throw new Error("Invalid email or password");
   }
-};
 
-// Patient Login
-export const patientLogin = async (req, res) => {
+  // Check password
+  const isMatch = await bcrypt.compare(password, patient.password);
+
+  if (!isMatch) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+  res.json({
+    _id: patient._id,
+    name: patient.name,
+    email: patient.email,
+    role: "Patient",
+    token: generateToken(patient._id),
+  });
+});
+
+// @desc    Get current user
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  });
+});
+
+// @desc    Verify token
+// @route   GET /api/auth/verify
+// @access  Public
+const verify = asyncHandler(async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    res.status(401);
+    throw new Error("Not authorized, no token");
+  }
+
   try {
-    const { email, password } = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
 
-    // Find patient with password included
-    const patient = await Patient.findOne({ email }).select('+password');
-    if (!patient) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user) {
+      res.status(401);
+      throw new Error("Not authorized");
     }
-
-    // Check password
-    const isMatch = await bcrypt.compare(password, patient.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Check if using temporary password
-    if (patient.temporaryPassword) {
-      return res.json({
-        temporaryPassword: true,
-        patientId: patient._id
-      });
-    }
-
-    // Generate token
-    const token = jwt.sign(
-      { id: patient._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' }
-    );
 
     res.json({
-      token,
-      user: {
-        _id: patient._id,
-        name: patient.name,
-        email: patient.email,
-        role: 'Patient'
-      }
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(401);
+    throw new Error("Not authorized");
   }
-};
+});
 
-export const getMe = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    res.json(user);
-  } catch (error) {
-    console.error('Error fetching user details:', error);
-    res.status(500).json({ message: 'Error fetching user details' });
-  }
-};
+export { login, register, patientLogin, getMe, verify };

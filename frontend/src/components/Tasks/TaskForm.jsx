@@ -1,171 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { getAllDentists } from '../../api';
-import moment from 'moment';
-import './TaskForm.scss';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { FaTimes } from "react-icons/fa";
 
-const TaskForm = ({ onSubmit, onClose, initialData = null }) => {
+const TaskForm = ({ task, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    type: initialData?.type || 'general',
-    priority: initialData?.priority || 'medium',
-    description: initialData?.description || '',
-    assignedTo: initialData?.assignedTo || '',
-    dueDate: initialData?.dueDate ? moment(initialData.dueDate).format('YYYY-MM-DD') : '',
-    notes: initialData?.notes || ''
+    title: task?.title || "",
+    description: task?.description || "",
+    dueDate: task?.dueDate || "",
+    priority: task?.priority || "medium",
+    status: task?.status || "pending",
   });
 
-  const [dentists, setDentists] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    fetchDentists();
-  }, []);
-
-  const fetchDentists = async () => {
-    try {
-      const response = await getAllDentists();
-      setDentists(response.data);
-    } catch (err) {
-      setError('Failed to fetch dentists');
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      await onSubmit(formData);
-      onClose();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save task');
-    } finally {
-      setLoading(false);
-    }
+    onSave(formData);
   };
 
   return (
-    <div className="task-form-modal-overlay" onClick={onClose}>
-      <div className="task-form-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{initialData ? 'Edit Task' : 'New Task'}</h2>
-          <button className="close-btn" onClick={onClose}>&times;</button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {task ? "Edit Task" : "New Task"}
+          </h2>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="type">Task Type</label>
-            <select
-              id="type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Title
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               required
-            >
-              <option value="general">General</option>
-              <option value="followup">Follow-up</option>
-              <option value="reminder">Reminder</option>
-              <option value="reschedule">Reschedule</option>
-            </select>
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Enter task title"
+            />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="priority">Priority</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={4}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Enter task description"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Due Date
+            </label>
+            <input
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) =>
+                setFormData({ ...formData, dueDate: e.target.value })
+              }
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Priority
+            </label>
             <select
-              id="priority"
-              name="priority"
               value={formData.priority}
-              onChange={handleChange}
-              required
+              onChange={(e) =>
+                setFormData({ ...formData, priority: e.target.value })
+              }
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
-              <option value="urgent">Urgent</option>
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              rows={3}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="assignedTo">Assign To</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
             <select
-              id="assignedTo"
-              name="assignedTo"
-              value={formData.assignedTo}
-              onChange={handleChange}
-              required
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value })
+              }
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             >
-              <option value="">Select Staff Member</option>
-              {dentists.map(dentist => (
-                <option key={dentist._id} value={dentist._id}>
-                  {dentist.name}
-                </option>
-              ))}
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="dueDate">Due Date</label>
-            <input
-              type="date"
-              id="dueDate"
-              name="dueDate"
-              value={formData.dueDate}
-              onChange={handleChange}
-              min={moment().format('YYYY-MM-DD')}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="notes">Additional Notes</label>
-            <textarea
-              id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows={2}
-            />
-          </div>
-
-          <div className="form-actions">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
             <button
               type="button"
-              className="btn secondary"
-              onClick={onClose}
-              disabled={loading}
+              onClick={onCancel}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="btn primary"
-              disabled={loading}
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {loading ? 'Saving...' : initialData ? 'Update Task' : 'Create Task'}
+              {task ? "Update Task" : "Create Task"}
             </button>
           </div>
         </form>
@@ -175,16 +134,15 @@ const TaskForm = ({ onSubmit, onClose, initialData = null }) => {
 };
 
 TaskForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-  initialData: PropTypes.shape({
-    type: PropTypes.string,
-    priority: PropTypes.string,
+  task: PropTypes.shape({
+    title: PropTypes.string,
     description: PropTypes.string,
-    assignedTo: PropTypes.string,
     dueDate: PropTypes.string,
-    notes: PropTypes.string
-  })
+    priority: PropTypes.string,
+    status: PropTypes.string,
+  }),
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
-export default TaskForm; 
+export default TaskForm;

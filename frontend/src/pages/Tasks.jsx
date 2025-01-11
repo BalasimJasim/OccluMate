@@ -1,9 +1,7 @@
-import React from 'react';
-
 const Tasks = () => {
   return (
-    <div>
-      <h1>Tasks</h1>
+    <div className="max-w-7xl mx-auto p-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Tasks</h1>
       {/* Add your tasks content here */}
     </div>
   );

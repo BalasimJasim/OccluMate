@@ -15,8 +15,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import userRoutes from './routes/userRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
-import sendSMS from './utils/sendSMS.js';
-import testRoutes from './routes/testRoutes.js';
+import staffRoutes from "./routes/staffRoutes.js";
+import sendSMS from "./utils/sendSMS.js";
+import testRoutes from "./routes/testRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -42,38 +43,41 @@ app.use(
 );
 
 // Add this before your routes
-app.options('*', cors()); // Enable pre-flight for all routes
+app.options("*", cors()); // Enable pre-flight for all routes
 
 // Middleware
-app.use(express.json({
-  verify: (req, res, buf) => {
-    try {
-      JSON.parse(buf);
-    } catch (e) {
-      res.status(400).json({ message: 'Invalid JSON' });
-      throw new Error('Invalid JSON');
-    }
-  }
-}));
-app.use(morgan('dev')); 
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      try {
+        JSON.parse(buf);
+      } catch (e) {
+        res.status(400).json({ message: "Invalid JSON" });
+        throw new Error("Invalid JSON");
+      }
+    },
+  })
+);
+app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
   res.send("Welcome to OccluMate!");
 });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/patients', patientRoutes); 
-app.use('/api/appointments', appointmentRoutes);  
-app.use('/api/dental-charts', dentalChartRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/patient-portal', patientPortalRoutes);
-app.use('/api/medical-records', medicalRecordRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/prescriptions', prescriptionRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/reminders', reminderRoutes);
-app.use('/api/test', testRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/patients", patientRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/dental-charts", dentalChartRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/patient-portal", patientPortalRoutes);
+app.use("/api/medical-records", medicalRecordRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/reminders", reminderRoutes);
+app.use("/api/test", testRoutes);
+app.use("/api/staff", staffRoutes);
 
 // Add this after your other middleware
 app.use((err, req, res, next) => {

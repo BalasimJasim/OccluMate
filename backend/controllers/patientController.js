@@ -82,10 +82,13 @@ export const addPatient = async (req, res) => {
 // Get all patients with pagination
 export const getAllPatients = async (req, res) => {
   try {
+    console.log("[getAllPatients] Fetching patients...");
     const patients = await Patient.find();
+    console.log("[getAllPatients] Found patients:", patients.length);
+    console.log("[getAllPatients] First few patients:", patients.slice(0, 2));
     res.json(patients);
   } catch (error) {
-    console.error('Error fetching patients:', error);
+    console.error("[getAllPatients] Error fetching patients:", error);
     res.status(500).json({ message: 'Error fetching patients', error: error.message });
   }
 };

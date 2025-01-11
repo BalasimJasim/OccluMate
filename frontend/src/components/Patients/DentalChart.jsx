@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import './DentalChart.scss';
-import ToothModal from './ToothModal';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import ToothModal from "./ToothModal";
 import ToothTooltip from "./ToothToolTip";
 
 const DentalChart = ({ patientId, initialData, onUpdate }) => {
@@ -26,7 +25,6 @@ const DentalChart = ({ patientId, initialData, onUpdate }) => {
     const toothData = chartData[number] || {};
 
     if (!viewMode === "structural" && toothData.full === "missing") {
-      // You could show a toast notification or alert here
       console.warn(
         "This tooth is marked as missing. Switch to structural view to modify."
       );
@@ -37,20 +35,9 @@ const DentalChart = ({ patientId, initialData, onUpdate }) => {
     setSelectedSurface(viewMode === "structural" ? "full" : null);
   };
 
-  const handleSurfaceClick = (toothNumber, surface, event) => {
-    event.stopPropagation();
-    setSelectedTooth({ number: toothNumber });
-    setSelectedSurface(surface);
-  };
-
   const handleModalClose = () => {
     setSelectedTooth(null);
     setSelectedSurface(null);
-  };
-
-  const handleStructuralClick = (toothNumber, part) => {
-    setSelectedTooth({ number: toothNumber });
-    setSelectedSurface(part); // 'crown', 'root', or 'full'
   };
 
   const handleSaveChanges = (procedure, comment) => {
@@ -113,39 +100,48 @@ const DentalChart = ({ patientId, initialData, onUpdate }) => {
 
   // Add view mode toggle
   const renderViewToggle = () => (
-    <div className="view-toggle">
-      <div className="toggle-container">
+    <div className="mb-6">
+      <div className="relative inline-flex bg-gray-100 rounded-lg p-1">
         <button
-          className={`toggle-btn ${viewMode === "surface" ? "active" : ""}`}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            viewMode === "surface"
+              ? "bg-white text-blue-600 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
           onClick={() => setViewMode("surface")}
         >
           Surface View
         </button>
         <button
-          className={`toggle-btn ${viewMode === "structural" ? "active" : ""}`}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            viewMode === "structural"
+              ? "bg-white text-blue-600 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
           onClick={() => setViewMode("structural")}
         >
           Structural View
         </button>
-        <div
-          className="toggle-slider"
-          style={{
-            transform: `translateX(${viewMode === "surface" ? "0" : "100%"})`,
-          }}
-        />
       </div>
     </div>
   );
 
   // Render functions
   const renderToothSurfaces = (number, toothData = {}) => {
-    const isAnterior = [
-      13, 12, 11, 21, 22, 23, 43, 42, 41, 31, 32, 33,
-    ].includes(number);
     const isLowerJaw = number >= 31;
     const isMissing = toothData.full === "missing";
 
-    const handleSurfaceClick = (surface, e) => {
+    const surfaceClasses = (surface) => {
+      const baseClasses =
+        "w-6 h-6 border border-gray-300 cursor-pointer transition-colors";
+      const procedureClass = toothData[surface]
+        ? `bg-${getProcedureColor(toothData[surface])}`
+        : "bg-white";
+      const disabledClass = isMissing ? "opacity-50 cursor-not-allowed" : "";
+      return `${baseClasses} ${procedureClass} ${disabledClass}`;
+    };
+
+    const handleLocalSurfaceClick = (surface, e) => {
       e.stopPropagation();
       if (isMissing) return;
       setSelectedTooth({ number });
@@ -153,188 +149,156 @@ const DentalChart = ({ patientId, initialData, onUpdate }) => {
     };
 
     return (
-      <div className={`tooth-surfaces ${isMissing ? "missing" : ""}`}>
+      <div
+        className={`relative grid grid-cols-3 gap-0.5 w-20 h-20 ${
+          isMissing ? "opacity-50" : ""
+        }`}
+      >
         {!isLowerJaw ? (
           <>
             <div
-              className={`surface buccal ${
-                toothData.buccal ? `procedure-${toothData.buccal}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("buccal", e)}
+              className={surfaceClasses("buccal")}
+              onClick={(e) => handleLocalSurfaceClick("buccal", e)}
             />
             <div
-              className={`surface mesial ${
-                toothData.mesial ? `procedure-${toothData.mesial}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("mesial", e)}
+              className={surfaceClasses("mesial")}
+              onClick={(e) => handleLocalSurfaceClick("mesial", e)}
             />
             <div
-              className={`surface occlusal ${
-                toothData.occlusal ? `procedure-${toothData.occlusal}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("occlusal", e)}
+              className={surfaceClasses("occlusal")}
+              onClick={(e) => handleLocalSurfaceClick("occlusal", e)}
             />
             <div
-              className={`surface distal ${
-                toothData.distal ? `procedure-${toothData.distal}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("distal", e)}
+              className={surfaceClasses("distal")}
+              onClick={(e) => handleLocalSurfaceClick("distal", e)}
             />
             <div
-              className={`surface lingual ${
-                toothData.lingual ? `procedure-${toothData.lingual}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("lingual", e)}
+              className={surfaceClasses("lingual")}
+              onClick={(e) => handleLocalSurfaceClick("lingual", e)}
             />
           </>
         ) : (
           <>
             <div
-              className={`surface buccal ${
-                toothData.buccal ? `procedure-${toothData.buccal}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("buccal", e)}
+              className={surfaceClasses("buccal")}
+              onClick={(e) => handleLocalSurfaceClick("buccal", e)}
             />
             <div
-              className={`surface mesial ${
-                toothData.mesial ? `procedure-${toothData.mesial}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("mesial", e)}
+              className={surfaceClasses("mesial")}
+              onClick={(e) => handleLocalSurfaceClick("mesial", e)}
             />
             <div
-              className={`surface occlusal ${
-                toothData.occlusal ? `procedure-${toothData.occlusal}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("occlusal", e)}
+              className={surfaceClasses("occlusal")}
+              onClick={(e) => handleLocalSurfaceClick("occlusal", e)}
             />
             <div
-              className={`surface distal ${
-                toothData.distal ? `procedure-${toothData.distal}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("distal", e)}
+              className={surfaceClasses("distal")}
+              onClick={(e) => handleLocalSurfaceClick("distal", e)}
             />
             <div
-              className={`surface lingual ${
-                toothData.lingual ? `procedure-${toothData.lingual}` : ""
-              } ${isMissing ? "disabled" : ""}`}
-              onClick={(e) => handleSurfaceClick("lingual", e)}
+              className={surfaceClasses("lingual")}
+              onClick={(e) => handleLocalSurfaceClick("lingual", e)}
             />
           </>
         )}
-        {isMissing && <div className="missing-indicator" />}
+        {isMissing && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-0.5 bg-red-500 transform rotate-45" />
+          </div>
+        )}
       </div>
     );
   };
 
   const renderToothStructural = (number, toothData = {}) => {
+    const isMissing = toothData.full === "missing";
+    const structuralClasses = (part) => {
+      const baseClasses = "w-full cursor-pointer transition-colors";
+      const procedureClass = toothData[part]
+        ? `bg-${getProcedureColor(toothData[part])}`
+        : "bg-white";
+      return `${baseClasses} ${procedureClass}`;
+    };
+
     return (
       <div
-        className={`tooth-structural ${
-          toothData.full === "missing" ? "missing" : ""
-        }`}
+        className={`relative w-16 h-24 ${isMissing ? "opacity-50" : ""}`}
         onClick={(e) => handleToothClick(number, e)}
       >
         <div
-          className={`crown ${
-            toothData.crown ? `procedure-${toothData.crown}` : ""
-          }`}
+          className={`${structuralClasses(
+            "crown"
+          )} h-1/2 border border-gray-300 rounded-t-lg`}
           onClick={(e) => {
             e.stopPropagation();
             setSelectedTooth({ number });
             setSelectedSurface("crown");
           }}
         />
-        <div className="root-container">
+        <div className="h-1/2 flex justify-center">
           <div
-            className={`root ${
-              toothData.root ? `procedure-${toothData.root}` : ""
-            }`}
+            className={`${structuralClasses(
+              "root"
+            )} w-1/2 border-x border-b border-gray-300 rounded-b-lg`}
             onClick={(e) => {
               e.stopPropagation();
               setSelectedTooth({ number });
               setSelectedSurface("root");
             }}
-          >
-            {toothData.root === "rootcanal" && (
-              <div className="root-canal-indicator" />
-            )}
-            {toothData.root === "implant" && (
-              <div className="implant-indicator" />
-            )}
-          </div>
+          />
         </div>
-        {toothData.full === "missing" && <div className="missing-indicator" />}
+        {isMissing && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-0.5 bg-red-500 transform rotate-45" />
+          </div>
+        )}
       </div>
     );
   };
 
-  // Add this new function before renderJaw
   const renderTooth = (number, toothData) => {
-    const hasComments =
-      toothData.comments && Object.keys(toothData.comments).length > 0;
-    const procedures = Object.keys(toothData).filter(
-      (key) => key !== "comments" && toothData[key]
-    );
-
     return (
       <div
-        className="tooth-wrapper"
-        onMouseEnter={() => setHoveredTooth(number)} // Set hovered tooth on mouse enter
-        onMouseLeave={() => setHoveredTooth(null)} // Clear hovered tooth on mouse leave
+        key={number}
+        className="relative"
+        onMouseEnter={() => setHoveredTooth(number)}
+        onMouseLeave={() => setHoveredTooth(null)}
       >
-        <div
-          className={`tooth ${
-            toothData.status ? `procedure-${toothData.status}` : ""
-          } ${hasComments ? "has-comments" : ""}`}
-        >
-          <div className="tooth-number">{number}</div>
-          {viewMode === "surface"
-            ? renderToothSurfaces(number, toothData) // Render surfaces in surface view
-            : renderToothStructural(number, toothData)}
-          {hasComments && <div className="comment-indicator" />}
-        </div>
+        <div className="text-center text-sm text-gray-600 mb-1">{number}</div>
+        {viewMode === "surface"
+          ? renderToothSurfaces(number, toothData)
+          : renderToothStructural(number, toothData)}
         {hoveredTooth === number && (
           <ToothTooltip
-            procedures={toothData} // Pass the entire toothData to get procedures
-            comments={toothData.comments} // Pass comments
-            viewMode={viewMode} // Pass the current view mode
+            toothNumber={number}
+            toothData={toothData}
+            className="absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2"
           />
         )}
       </div>
     );
   };
 
-  // Simplified render function for the entire jaw
-  const renderJaw = (teeth, isUpperJaw) => {
-    return (
-      <div className={`jaw ${isUpperJaw ? "upper-jaw" : "lower-jaw"}`}>
-        {teeth.map((number) => {
-          const toothData = chartData[number] || {};
-          return renderTooth(number, toothData); // Call renderTooth for each tooth
-        })}
-      </div>
-    );
-  };
+  const renderJaw = (teeth, isUpperJaw) => (
+    <div className={`grid grid-cols-8 gap-4 ${isUpperJaw ? "mb-12" : "mt-12"}`}>
+      {teeth.map((number) => renderTooth(number, chartData[number] || {}))}
+    </div>
+  );
 
-  // Main render
   return (
-    <div className="dental-chart">
+    <div className="p-6 bg-white rounded-lg shadow-sm">
       {renderViewToggle()}
-      {renderJaw(upperTeeth, true)} {/* Render upper jaw */}
-      <div className="jaw-separator">
-        <div className="separator-label right">Right</div>
-        <div className="midline"></div>
-        <div className="separator-label left">Left</div>
+      <div className="max-w-4xl mx-auto">
+        {renderJaw(upperTeeth, true)}
+        {renderJaw(lowerTeeth, false)}
       </div>
-      {renderJaw(lowerTeeth, false)} {/* Render lower jaw */}
       {selectedTooth && (
         <ToothModal
-          toothNumber={selectedTooth.number}
-          surface={selectedSurface || "full"}
-          toothData={chartData[selectedTooth.number] || {}}
+          tooth={selectedTooth}
+          surface={selectedSurface}
+          data={chartData[selectedTooth.number] || {}}
           onClose={handleModalClose}
           onSave={handleSaveChanges}
-          isStructural={viewMode === "structural"}
           viewMode={viewMode}
         />
       )}
@@ -342,10 +306,23 @@ const DentalChart = ({ patientId, initialData, onUpdate }) => {
   );
 };
 
+const getProcedureColor = (procedure) => {
+  const colors = {
+    caries: "yellow-200",
+    filling: "blue-200",
+    crown: "gray-200",
+    missing: "red-200",
+    bridge: "purple-200",
+    implant: "green-200",
+    root_canal: "orange-200",
+  };
+  return colors[procedure] || "white";
+};
+
 DentalChart.propTypes = {
   patientId: PropTypes.string.isRequired,
   initialData: PropTypes.object,
-  onUpdate: PropTypes.func
+  onUpdate: PropTypes.func,
 };
 
 export default DentalChart;

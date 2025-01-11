@@ -1,47 +1,50 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import { createPrescription, getPatientById, getPharmacies } from '../../api';
-import './PrescriptionForm.scss';
+import { AuthContext } from "../../context/authContext";
+import { createPrescription, getPatientById, getPharmacies } from "../../api";
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 const FREQUENCIES = [
-  'Once daily',
-  'Twice daily',
-  'Three times daily',
-  'Four times daily',
-  'Every 4 hours',
-  'Every 6 hours',
-  'Every 8 hours',
-  'As needed'
+  "Once daily",
+  "Twice daily",
+  "Three times daily",
+  "Four times daily",
+  "Every 4 hours",
+  "Every 6 hours",
+  "Every 8 hours",
+  "Every 12 hours",
+  "As needed",
 ];
 
 const DURATIONS = [
-  '3 days',
-  '5 days',
-  '7 days',
-  '10 days',
-  '14 days',
-  '30 days'
+  "3 days",
+  "5 days",
+  "7 days",
+  "10 days",
+  "14 days",
+  "30 days",
+  "60 days",
+  "90 days",
 ];
 
 const PrescriptionForm = ({ patientId, onClose, onPrescriptionCreated }) => {
   const { user } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    diagnosis: '',
-    medications: [{
-      name: '',
-      dosage: '',
-      frequency: FREQUENCIES[0],
-      duration: DURATIONS[0],
-      notes: ''
-    }],
-    pharmacy: '',
-    notes: ''
-  });
   const [patient, setPatient] = useState(null);
   const [pharmacies, setPharmacies] = useState([]);
+  const [formData, setFormData] = useState({
+    medications: [
+      {
+        name: "",
+        dosage: "",
+        frequency: FREQUENCIES[0],
+        duration: DURATIONS[0],
+        instructions: "",
+      },
+    ],
+    pharmacyId: "",
+    notes: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchPatientData();
@@ -50,239 +53,267 @@ const PrescriptionForm = ({ patientId, onClose, onPrescriptionCreated }) => {
 
   const fetchPatientData = async () => {
     try {
-      const response = await getPatientById(patientId);
-      setPatient(response.data);
+      const data = await getPatientById(patientId);
+      setPatient(data);
     } catch (err) {
-      setError('Failed to fetch patient data');
+      setError("Failed to fetch patient data");
     }
   };
 
   const fetchPharmacies = async () => {
     try {
-      const response = await getPharmacies();
-      setPharmacies(response.data);
+      const data = await getPharmacies();
+      setPharmacies(data);
+      if (data.length > 0) {
+        setFormData((prev) => ({ ...prev, pharmacyId: data[0].id }));
+      }
     } catch (err) {
-      setError('Failed to fetch pharmacies');
+      setError("Failed to fetch pharmacies");
     }
   };
 
   const handleMedicationChange = (index, field, value) => {
     const newMedications = [...formData.medications];
-    newMedications[index][field] = value;
-    setFormData({ ...formData, medications: newMedications });
+    newMedications[index] = { ...newMedications[index], [field]: value };
+    setFormData((prev) => ({ ...prev, medications: newMedications }));
   };
 
   const addMedication = () => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       medications: [
-        ...formData.medications,
+        ...prev.medications,
         {
-          name: '',
-          dosage: '',
+          name: "",
+          dosage: "",
           frequency: FREQUENCIES[0],
           duration: DURATIONS[0],
-          notes: ''
-        }
-      ]
-    });
+          instructions: "",
+        },
+      ],
+    }));
   };
 
   const removeMedication = (index) => {
     const newMedications = formData.medications.filter((_, i) => i !== index);
-    setFormData({ ...formData, medications: newMedications });
+    setFormData((prev) => ({ ...prev, medications: newMedications }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const prescriptionData = {
         ...formData,
-        patient: patientId,
-        dentist: user._id,
-        expiryDate: calculateExpiryDate(formData.medications[0].duration)
+        patientId,
+        dentistId: user.id,
+        date: new Date().toISOString(),
       };
 
-      const response = await createPrescription(prescriptionData);
-      onPrescriptionCreated(response.data);
+      await createPrescription(prescriptionData);
+      onPrescriptionCreated();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create prescription');
+      setError("Failed to create prescription");
     } finally {
       setLoading(false);
     }
   };
 
+  if (!patient) return null;
+
   return (
-    <div className="prescription-form-modal">
-      <div className="modal-header">
-        <h2>New Prescription</h2>
-        <button className="close-btn" onClick={onClose}>&times;</button>
-      </div>
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-4xl w-full mx-auto">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        New Prescription for {patient.name}
+      </h2>
 
-      {error && <div className="error-message">{error}</div>}
-
-      <form onSubmit={handleSubmit}>
-        {/* Patient Information */}
-        <div className="patient-info">
-          <h3>Patient Information</h3>
-          <p>Name: {patient?.name}</p>
-          <p>Age: {patient?.age}</p>
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
+          {error}
         </div>
+      )}
 
-        {/* Diagnosis */}
-        <div className="form-group">
-          <label htmlFor="diagnosis">Diagnosis</label>
-          <input
-            type="text"
-            id="diagnosis"
-            value={formData.diagnosis}
-            onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
-            required
-          />
-        </div>
-
-        {/* Medications */}
-        <div className="medications-section">
-          <h3>Medications</h3>
-          {formData.medications.map((medication, index) => (
-            <div key={index} className="medication-item">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Medication Name</label>
-                  <input
-                    type="text"
-                    value={medication.name}
-                    onChange={(e) => handleMedicationChange(index, 'name', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Dosage</label>
-                  <input
-                    type="text"
-                    value={medication.dosage}
-                    onChange={(e) => handleMedicationChange(index, 'dosage', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Frequency</label>
-                  <select
-                    value={medication.frequency}
-                    onChange={(e) => handleMedicationChange(index, 'frequency', e.target.value)}
-                  >
-                    {FREQUENCIES.map(freq => (
-                      <option key={freq} value={freq}>{freq}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Duration</label>
-                  <select
-                    value={medication.duration}
-                    onChange={(e) => handleMedicationChange(index, 'duration', e.target.value)}
-                  >
-                    {DURATIONS.map(dur => (
-                      <option key={dur} value={dur}>{dur}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {showAdvanced && (
-                <div className="form-group">
-                  <label>Special Instructions</label>
-                  <textarea
-                    value={medication.notes}
-                    onChange={(e) => handleMedicationChange(index, 'notes', e.target.value)}
-                    placeholder="Enter any special instructions..."
-                  />
-                </div>
-              )}
-
-              {formData.medications.length > 1 && (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {formData.medications.map((medication, index) => (
+          <div key={index} className="bg-gray-50 p-4 rounded-md space-y-4">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-medium text-gray-700">
+                Medication {index + 1}
+              </h3>
+              {index > 0 && (
                 <button
                   type="button"
-                  className="btn remove"
                   onClick={() => removeMedication(index)}
+                  className="text-red-600 hover:text-red-700 p-1"
                 >
-                  Remove Medication
+                  <FaTrash className="h-4 w-4" />
                 </button>
               )}
             </div>
-          ))}
 
-          <button
-            type="button"
-            className="btn add"
-            onClick={addMedication}
-          >
-            Add Another Medication
-          </button>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Medication Name
+                </label>
+                <input
+                  type="text"
+                  value={medication.name}
+                  onChange={(e) =>
+                    handleMedicationChange(index, "name", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                />
+              </div>
 
-        <div className="form-group">
-          <label>Pharmacy</label>
-          <select
-            value={formData.pharmacy}
-            onChange={(e) => setFormData({ ...formData, pharmacy: e.target.value })}
-            required
-          >
-            <option value="">Select Pharmacy</option>
-            {pharmacies.map(pharmacy => (
-              <option key={pharmacy._id} value={pharmacy._id}>
-                {pharmacy.name} - {pharmacy.address}
-              </option>
-            ))}
-          </select>
-        </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Dosage
+                </label>
+                <input
+                  type="text"
+                  value={medication.dosage}
+                  onChange={(e) =>
+                    handleMedicationChange(index, "dosage", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Frequency
+                </label>
+                <select
+                  value={medication.frequency}
+                  onChange={(e) =>
+                    handleMedicationChange(index, "frequency", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  {FREQUENCIES.map((freq) => (
+                    <option key={freq} value={freq}>
+                      {freq}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Duration
+                </label>
+                <select
+                  value={medication.duration}
+                  onChange={(e) =>
+                    handleMedicationChange(index, "duration", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  {DURATIONS.map((dur) => (
+                    <option key={dur} value={dur}>
+                      {dur}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Special Instructions
+                </label>
+                <textarea
+                  value={medication.instructions}
+                  onChange={(e) =>
+                    handleMedicationChange(
+                      index,
+                      "instructions",
+                      e.target.value
+                    )
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  rows="2"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
 
         <button
           type="button"
-          className="btn toggle-advanced"
-          onClick={() => setShowAdvanced(!showAdvanced)}
+          onClick={addMedication}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
+          <FaPlus className="mr-2 h-4 w-4" />
+          Add Medication
         </button>
 
-        {showAdvanced && (
-          <div className="form-group">
-            <label>Additional Notes</label>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Pharmacy
+            </label>
+            <select
+              value={formData.pharmacyId}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, pharmacyId: e.target.value }))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              required
+            >
+              {pharmacies.map((pharmacy) => (
+                <option key={pharmacy.id} value={pharmacy.id}>
+                  {pharmacy.name} - {pharmacy.address}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Additional Notes
+            </label>
             <textarea
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Enter any additional notes..."
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, notes: e.target.value }))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              rows="3"
             />
           </div>
-        )}
+        </div>
 
-        <div className="form-actions">
+        <div className="flex justify-end space-x-3">
           <button
             type="button"
-            className="btn secondary"
             onClick={onClose}
-            disabled={loading}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn primary"
             disabled={loading}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? 'Creating...' : 'Create Prescription'}
+            {loading ? "Creating..." : "Create Prescription"}
           </button>
         </div>
       </form>
     </div>
   );
+};
+
+PrescriptionForm.propTypes = {
+  patientId: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onPrescriptionCreated: PropTypes.func.isRequired,
 };
 
 export default PrescriptionForm; 
